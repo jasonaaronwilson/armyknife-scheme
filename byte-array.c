@@ -52,7 +52,7 @@ __attribute__((warn_unused_result)) byte_array_t*
     for (int i = 0; i < arr->length; i++) {
       result = byte_array_append_byte(result, byte_array_get(arr, i));
     }
-    free(arr);
+    free_bytes(arr);
 
     return result;
   }

@@ -9,9 +9,11 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "allocate.h"
 #include "closure.h"
 #include "evaluator.h"
 #include "fatal-error.h"
@@ -21,7 +23,7 @@
 #include "scheme-symbol.h"
 #include "string-util.h"
 
-#define TAIL_CALL
+#define TAIL_CALL return
 
 // See the symbol-hash command line tool in this directory if you need
 // to generate more. Example make symbol-hash && ./symbol-hash 'if'
@@ -37,18 +39,24 @@
 // doing tail recursion.
 
 tagged_reference_t eval_if_expression(environment_t* env,
-                                      tagged_reference_t expr);
-tagged_reference_t eval_assignment(environment_t* env, tagged_reference_t expr);
-tagged_reference_t eval_application(environment_t* env,
-                                    tagged_reference_t expr);
-tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr);
+                                      tagged_reference_t expr,
+                                      boolean_t in_tail_position);
+tagged_reference_t eval_assignment(environment_t* env, tagged_reference_t expr,
+                                   boolean_t in_tail_position);
+tagged_reference_t eval_application(environment_t* env, tagged_reference_t expr,
+                                    boolean_t in_tail_position);
+tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr,
+                               boolean_t in_tail_position);
 
 /**
  * This is the entry point to the evaluator. Dvaluate the given
  * expression and return a tagged_reference_t to the result of
  * interpreting it.
  */
-tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
+tagged_reference_t eval(environment_t* env, tagged_reference_t expr,
+                        boolean_t in_tail_position) {
+
+  fprintf(stderr, "in_tail_position = %d\n", in_tail_position);
 
   // Handle self-evaluating values and variable lookups
   switch (expr.tag) {
@@ -56,6 +64,9 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
   case TAG_STRING:
   case TAG_UINT64_T:
   case TAG_ERROR_T:
+    if (in_tail_position && !env->is_captured) {
+      free_bytes(env);
+    }
     return expr;
 
   case TAG_SCHEME_SYMBOL:
@@ -64,6 +75,9 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
       if (!optional_is_present(result)) {
         fatal_error(ERROR_VARIABLE_NOT_FOUND);
       }
+      if (in_tail_position && !env->is_captured) {
+        free_bytes(env);
+      }
       return optional_value(result);
     }
   }
@@ -71,6 +85,9 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
   pair_t* lst = untag_pair(expr);
 
   if (pair_list_length(lst) == 0) {
+    if (in_tail_position && !env->is_captured) {
+      free_bytes(env);
+    }
     return (tagged_reference_t){ERROR_CANT_EVAL_EMPTY_EXPRESSION, TAG_ERROR_T};
   }
 
@@ -87,36 +104,43 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
       if (!string_equal(symbol_name, "if")) {
         break;
       }
-      TAIL_CALL return eval_if_expression(env, expr);
+      TAIL_CALL eval_if_expression(env, expr, in_tail_position);
       break;
 
     case HASHCODE_SET_BANG:
       if (!string_equal(symbol_name, "set!")) {
         break;
       }
-      return eval_assignment(env, expr);
+      TAIL_CALL eval_assignment(env, expr, in_tail_position);
 
     case HASHCODE_QUOTE:
+      if (in_tail_position && !env->is_captured) {
+        free_bytes(env);
+      }
       return pair_list_get(lst, 1);
 
     case HASHCODE_LAMBDA:
-      return eval_lambda(env, expr);
+      TAIL_CALL eval_lambda(env, expr, in_tail_position);
 
     case HASHCODE_DEFINE:
       if (1) {
         tagged_reference_t name = pair_list_get(lst, 1);
-        tagged_reference_t value = eval(env, pair_list_get(lst, 2));
+        tagged_reference_t value = eval(env, pair_list_get(lst, 2), false);
         environment_define(env, untag_reader_symbol(name), value);
+        if (in_tail_position && !env->is_captured) {
+          free_bytes(env);
+        }
         return NIL;
       }
     }
   }
 
-  TAIL_CALL return eval_application(env, expr);
+  TAIL_CALL eval_application(env, expr, in_tail_position);
 }
 
 tagged_reference_t eval_if_expression(environment_t* env,
-                                      tagged_reference_t expr) {
+                                      tagged_reference_t expr,
+                                      boolean_t in_tail_position) {
   pair_t* lst = untag_pair(expr);
   tagged_reference_t test_expr = pair_list_get(lst, 1);
   tagged_reference_t consequent_expr = pair_list_get(lst, 2);
@@ -124,25 +148,29 @@ tagged_reference_t eval_if_expression(environment_t* env,
   if (pair_list_length(lst) >= 3) {
     alternative_expr = pair_list_get(lst, 3);
   }
-  tagged_reference_t evaluated_expr = eval(env, test_expr);
+  tagged_reference_t evaluated_expr = eval(env, test_expr, false);
   if (is_false(evaluated_expr)) {
-    TAIL_CALL return eval(env, alternative_expr);
+    TAIL_CALL eval(env, alternative_expr, in_tail_position);
   } else {
-    TAIL_CALL return eval(env, consequent_expr);
+    TAIL_CALL eval(env, consequent_expr, in_tail_position);
   }
 }
 
-tagged_reference_t eval_assignment(environment_t* env,
-                                   tagged_reference_t expr) {
-  // fixme
+// I guess technically this doesn't need have the same signature?
+tagged_reference_t eval_assignment(environment_t* env, tagged_reference_t expr,
+                                   boolean_t in_tail_position) {
+  // TODO(jawilson): do the assignment!
+  if (in_tail_position && !env->is_captured) {
+    free_bytes(env);
+  }
   return NIL;
 }
 
 /**
  * Evaluate and application, i.e., a function call.
  */
-tagged_reference_t eval_application(environment_t* env,
-                                    tagged_reference_t expr) {
+tagged_reference_t eval_application(environment_t* env, tagged_reference_t expr,
+                                    boolean_t in_tail_position) {
   primitive_arguments_t arguments = {.n_args = 0};
 
   // The above should be sufficient but just clear the entire
@@ -154,22 +182,25 @@ tagged_reference_t eval_application(environment_t* env,
 
   pair_t* lst = untag_pair(expr);
 
-  tagged_reference_t fn = eval(env, pair_list_get(lst, 0));
+  tagged_reference_t fn = eval(env, pair_list_get(lst, 0), false);
 
   for (int i = 1; (i < pair_list_length(lst)); i++) {
     if (i >= MAX_PRIMITIVE_ARGS) {
       fatal_error(ERROR_MAX_PRIMITIVE_ARGS);
     }
     tagged_reference_t arg_expr = pair_list_get(lst, i);
-    arguments.args[arguments.n_args++] = eval(env, arg_expr);
+    arguments.args[arguments.n_args++] = eval(env, arg_expr, false);
+  }
+
+  if (in_tail_position && !env->is_captured) {
+    free_bytes(env);
+    env = 0;
   }
 
   if (fn.tag == TAG_PRIMITIVE) {
     primitive_t primitive = untag_primitive(fn);
     return primitive(arguments);
   }
-
-  // If it isn' a primitive then we need to invoke a closure.
 
   closure_t* closure = untag_closure_t(fn);
   env = make_environment(closure->env);
@@ -180,17 +211,18 @@ tagged_reference_t eval_application(environment_t* env,
 
   pair_t* sequence = untag_pair(closure->code);
   while (sequence->tail.tag != TAG_NULL) {
-    eval(env, sequence->head);
+    eval(env, sequence->head, false);
     sequence = untag_pair(sequence->tail);
   }
 
-  TAIL_CALL return eval(env, sequence->head);
+  TAIL_CALL eval(env, sequence->head, in_tail_position);
 }
 
 /**
  * Make a closure
  */
-tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr) {
+tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr,
+                               boolean_t in_tail_position) {
   pair_t* argument_list = untag_pair(pair_list_get(untag_pair(expr), 1));
   uint64_t n_args = pair_list_length(argument_list);
   closure_t* closure = allocate_closure(n_args);
@@ -202,6 +234,11 @@ tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr) {
     closure->arg_names[i]
         = untag_scheme_symbol(pair_list_get(argument_list, i));
   }
+
+  // Once we close over an environment we need a garbage collector to
+  // reclaim it (and don't need to free it here even if we are
+  // in_tail_position).
+  environment_capture(env);
 
   return tagged_reference(TAG_CLOSURE_T, closure);
 }

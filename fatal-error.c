@@ -57,6 +57,8 @@ const char* fatal_error_code_to_string(int error_code) {
     return "ERROR_UKNOWN";
   case ERROR_MEMORY_ALLOCATION:
     return "ERROR_MEMORY_ALLOCATION";
+  case ERROR_MEMORY_FREE_NULL:
+    return "ERROR_MEMORY_FREE_NULL";
   case ERROR_ARRAY_ACCESS_OUT_OF_BOUNDS:
     return "ERROR_ARRAY_ACCESS_OUT_OF_BOUNDS";
   case ERROR_ILLEGAL_LIST_INDEX:

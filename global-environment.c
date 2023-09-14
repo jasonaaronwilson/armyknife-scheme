@@ -36,6 +36,7 @@ void add_basic_primtives(environment_t* env);
 
 environment_t* make_global_environment() {
   environment_t* result = make_environment(NULL);
+  environment_capture(result);
   add_basic_primtives(result);
   return result;
 }

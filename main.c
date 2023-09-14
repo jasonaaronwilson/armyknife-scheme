@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     output = print_tagged_reference_to_byte_arary(output, expr);
     output = byte_array_append_byte(output, '\0');
 
-    tagged_reference_t result = eval(env, expr);
+    tagged_reference_t result = eval(env, expr, true);
 
     byte_array_t* output2 = make_byte_array(128);
     output2 = print_tagged_reference_to_byte_arary(output2, result);

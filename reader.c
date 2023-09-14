@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "allocate.h"
 #include "pair.h"
 #include "reader.h"
 #include "string-util.h"
@@ -74,7 +75,7 @@ read_expression_result_t read_expression(const char* str, uint64_t start) {
     }
     char* token = string_substring(str, start, end);
     uint64_t number = string_parse_uint64(token);
-    free(token);
+    free_bytes(token);
     return read_expression_result(tagged_reference(TAG_UINT64_T, number), end);
   } else {
     // a "symbol" in lisp parlance (but the rest of the code often

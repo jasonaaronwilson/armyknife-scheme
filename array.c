@@ -54,7 +54,7 @@ array_t* array_add(array_t* arr, uint64_t element) {
     for (int i = 0; i < arr->length; i++) {
       array_add(result, array_get(arr, i));
     }
-    free(arr);
+    free_bytes(arr);
     return result;
   }
 }
