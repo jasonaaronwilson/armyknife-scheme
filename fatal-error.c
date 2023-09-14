@@ -26,8 +26,7 @@ void _Noreturn fatal_error_impl(char* file, int line, int error_code) {
   print_backtrace();
   fprintf(stderr, "%s:%d: FATAL ERROR %d", file, line, error_code);
   print_error_code_name(error_code);
-
-  fprintf(stderr, "Exiting...\n");
+  fprintf(stderr, "Necessaria Morte Mori...\n");
   exit(-(error_code + 100));
 }
 
@@ -58,30 +57,8 @@ const char* fatal_error_code_to_string(int error_code) {
     return "ERROR_UKNOWN";
   case ERROR_MEMORY_ALLOCATION:
     return "ERROR_MEMORY_ALLOCATION";
-  case ERROR_MEMORY_READ:
-    return "ERROR_MEMORY_READ";
-  case ERROR_MEMORY_WRITE:
-    return "ERROR_MEMORY_WRITE";
-  case ERROR_OPCODE_UNKNOWN:
-    return "ERROR_OPCODE_UNKNOWN";
-  case ERROR_OPCODE_DECODE_ERROR:
-    return "ERROR_OPCODE_DECODE_ERROR";
-  case ERROR_ARG_DECODE_ERROR:
-    return "ERROR_ARG_DECODE_ERROR";
-  case ERROR_UNIMLEMENTED_OPCODE:
-    return "ERROR_UNIMLEMENTED_OPCODE";
-  case ERROR_TOKEN_LIST_GET:
-    return "ERROR_TOKEN_LIST_GET";
-  case ERROR_EXPECTED_GENERAL_REGISTER:
-    return "ERROR_EXPECTED_GENERAL_REGISTER";
-  case ERROR_EXPECTED_FLOATING_REGISTER:
-    return "ERROR_EXPECTED_FLOATING_REGISTER";
   case ERROR_ARRAY_ACCESS_OUT_OF_BOUNDS:
     return "ERROR_ARRAY_ACCESS_OUT_OF_BOUNDS";
-  case ERROR_UNKNOWN_ASSEMBLER_DIRECTIVE:
-    return "ERROR_UNKNOWN_ASSEMBLER_DIRECTIVE";
-  case ERROR_DEBUGGER_EXPECT_FAILURE:
-    return "ERROR_DEBUGGER_EXPECT_FAILURE";
   case ERROR_ILLEGAL_LIST_INDEX:
     return "ERROR_ILLEGAL_LIST_INDEX";
   case ERROR_CANT_EVAL_EMPTY_EXPRESSION:

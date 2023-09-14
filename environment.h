@@ -3,15 +3,10 @@
 
 #include "boolean.h"
 #include "pair.h"
-#include "symbol-table.h"
 
 typedef struct environment_S {
   struct environment_S* parent;
-  // This is the assembler/loader symbols, not lisp/scheme
-  // symbols. These are only accessed by (address-of foo) special
-  // form.
-  symbol_table_t* symbols;
-  // An environment is a large or small hashtable
+  // The global environment uses more buckets than a child environment
   int n_buckets;
   tagged_reference_t buckets[0]; // NIL or TAG_PAIR_T (association list)
 } environment_t;

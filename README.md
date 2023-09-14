@@ -36,6 +36,8 @@ Boehm–Demers–Weiser garbage collector.
 0x12345
 0b1111
 
+(exit)
+
 ```
 
 ## Supported Special Forms
@@ -56,6 +58,7 @@ Boehm–Demers–Weiser garbage collector.
 * +, -, *, / (signed 64bit integers only)
 * cons, car, cdr
 * string-append
+* exit
 
 ## Status
 

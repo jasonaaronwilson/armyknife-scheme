@@ -3,72 +3,65 @@
  * executable.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "allocate.h"
-#include "debug-repl.h"
-#include "interpreter.h"
-#include "opcodes.h"
-#include "paged-memory.h"
+#include "evaluator.h"
+#include "global-environment.h"
 #include "printer.h"
+#include "reader.h"
 
-void add_sample_program(cpu_thread_state_t* state, uint64_t address);
+byte_array_t* read_expression_lines(char* prompt);
 
 /**
  * This is a simple main routine for the interpreter.
  */
 int main(int argc, char** argv) {
 
-  int number_of_int_registers = 4096;
-  int number_of_fp_registers = 4096;
-  uint64_t memory_amount = 4096 * 128;
-  uint64_t start_pc = PAGE_SIZE;
+  fprintf(stderr,
+          ";;; armyknife-scheme - a demonstration scheme interpreter in C\n");
+  fprintf(stderr, ";;;   C-c will exit\n");
 
-  cpu_thread_state_t* state = (cpu_thread_state_t*) (malloc_bytes(
-      sizeof(cpu_thread_state_t) + number_of_int_registers * 8
-      + number_of_fp_registers * 8));
+  environment_t* env = make_global_environment();
 
-  state->pc = start_pc;
-  state->num_integer_regs = number_of_int_registers;
-  state->num_fp_regs = number_of_fp_registers;
-  // Don't put anything on the first page so that random reads and
-  // writes will fail to addresses near "NULL".
-  state->memory = allocate_page(0, PAGE_SIZE);
-
-  // add_sample_program(state, PAGE_SIZE);
-
-  char* debug = getenv("COMET_VM_DEBUG");
-  if (debug != NULL || 1) {
-    debug_repl(state);
-    exit(0);
-  }
-
-  // Single step until we have a BRK instruction
+  // read(), eval(), print() loop.
   while (1) {
-    uint64_t before_pc = state->pc;
-    print_instructions(state->memory, state->pc, 1);
-    interpret(state, 1);
-    print_registers(state, 16, 16);
-    // might need is_mapped...
-    if ((before_pc == state->pc) && (load8(state->memory, state->pc) == 0)) {
-      break;
-    }
+    byte_array_t* input_array = read_expression_lines("]=> ");
+    char* input = byte_array_c_substring(input_array, 0,
+                                         byte_array_length(input_array));
+
+    tagged_reference_t expr = read_expression(input, 0).result;
+    byte_array_t* output = make_byte_array(128);
+    output = print_tagged_reference_to_byte_arary(output, expr);
+    output = byte_array_append_byte(output, '\0');
+
+    tagged_reference_t result = eval(env, expr);
+
+    byte_array_t* output2 = make_byte_array(128);
+    output2 = print_tagged_reference_to_byte_arary(output2, result);
+    output2 = byte_array_append_byte(output2, '\0');
+
+    fprintf(stdout, "\n;Value: %s\n\n", &output2->elements[0]);
   }
 
-  debug_repl(state);
   exit(0);
 }
 
-#if 0
+/**
+ * Read one or more lines from stdin.
+ */
+byte_array_t* read_expression_lines(char* prompt) {
+  byte_array_t* result = make_byte_array(128);
+  fputs(prompt, stderr);
 
-// If really necessary, you can easily put some code into memory like
-// so...
+  char line[1024];
+  fgets(line, sizeof(line), stdin);
 
-void add_sample_program(cpu_thread_state_t* state, uint64_t address) {
-  store8(state->memory, address++, OPCODE_IMM);
-  store8(state->memory, address++, R1);
-  store8(state->memory, address++, 42);
+  // TODO(jawilson): read more lines if necessary to finish an
+  // expression.
 
-  store8(state->memory, address++, BRK);
+  result = byte_array_append_bytes(result, (uint8_t*) line, strlen(line));
+  return result;
 }
-#endif
