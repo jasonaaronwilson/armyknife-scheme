@@ -73,6 +73,7 @@ void environment_set(environment_t* env, char* var_name,
 void environment_define(environment_t* env, char* var_name,
                         tagged_reference_t value) {
 
+  /*
   // Total hack to put a debug name on closures defined at the
   // top-level. This is completely optional behavior as the debug name
   // is not directly accessible.
@@ -84,6 +85,7 @@ void environment_define(environment_t* env, char* var_name,
       }
     }
   }
+  */
 
   // TODO(jawilson): reuse the older binding if redefining...
   uint64_t hash_code = string_hash(var_name);

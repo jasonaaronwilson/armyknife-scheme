@@ -21,16 +21,17 @@
 #include "scheme-symbol.h"
 #include "string-util.h"
 
+#define TAIL_CALL
+
 // See the symbol-hash command line tool in this directory if you need
 // to generate more. Example make symbol-hash && ./symbol-hash 'if'
 // 'set!' 'quote' 'lambda'.
 
+#define HASHCODE_DEFINE UINT64_C(1242841461589453162)
 #define HASHCODE_IF UINT64_C(12687957717205024595)
-#define HASHCODE_SET_BANG UINT64_C(8292903574644452355)
-#define HASHCODE_QUOTE UINT64_C(10597478766694597373)
 #define HASHCODE_LAMBDA UINT64_C(11364329973434366565)
-#define HASHCODE_AND UINT64_C(11364329973434366565)
-#define HASHCODE_OR UINT64_C(11364329973434366565)
+#define HASHCODE_QUOTE UINT64_C(10597478766694597373)
+#define HASHCODE_SET_BANG UINT64_C(8292903574644452355)
 
 tagged_reference_t eval_if_expression(environment_t* env,
                                       tagged_reference_t expr);
@@ -54,13 +55,14 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
   case TAG_ERROR_T:
     return expr;
 
-  case TAG_SCHEME_SYMBOL: {
-    optional_t result = environment_get(env, (char*) expr.data);
-    if (!optional_is_present(result)) {
-      fatal_error(ERROR_VARIABLE_NOT_FOUND);
+  case TAG_SCHEME_SYMBOL:
+    if (1) {
+      optional_t result = environment_get(env, (char*) expr.data);
+      if (!optional_is_present(result)) {
+        fatal_error(ERROR_VARIABLE_NOT_FOUND);
+      }
+      return optional_value(result);
     }
-    return optional_value(result);
-  }
   }
 
   pair_t* lst = untag_pair(expr);
@@ -82,7 +84,7 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
       if (!string_equal(symbol_name, "if")) {
         break;
       }
-      return eval_if_expression(env, expr);
+      TAIL_CALL return eval_if_expression(env, expr);
       break;
 
     case HASHCODE_SET_BANG:
@@ -97,17 +99,17 @@ tagged_reference_t eval(environment_t* env, tagged_reference_t expr) {
     case HASHCODE_LAMBDA:
       return eval_lambda(env, expr);
 
-#if 0
-      // TODO
-    case HASHCODE_AND:
-    case HASHCODE_OR:
-#endif /* 0 */
+    case HASHCODE_DEFINE:
+      if (1) {
+        tagged_reference_t name = pair_list_get(lst, 1);
+        tagged_reference_t value = eval(env, pair_list_get(lst, 2));
+        environment_define(env, untag_reader_symbol(name), value);
+        return NIL;
+      }
     }
   }
 
-  return eval_application(env, expr);
-
-  return NIL;
+  TAIL_CALL return eval_application(env, expr);
 }
 
 tagged_reference_t eval_if_expression(environment_t* env,
@@ -121,9 +123,9 @@ tagged_reference_t eval_if_expression(environment_t* env,
   }
   tagged_reference_t evaluated_expr = eval(env, test_expr);
   if (is_false(evaluated_expr)) {
-    return eval(env, alternative_expr);
+    TAIL_CALL return eval(env, alternative_expr);
   } else {
-    return eval(env, consequent_expr);
+    TAIL_CALL return eval(env, consequent_expr);
   }
 }
 
@@ -164,7 +166,8 @@ tagged_reference_t eval_application(environment_t* env,
     return primitive(arguments);
   }
 
-  // Must be a closure.
+  // If it isn' a primitive then we need to invoke a closure.
+
   closure_t* closure = untag_closure_t(fn);
   env = make_environment(closure->env);
   // make sure number of args are compatible.
@@ -178,9 +181,7 @@ tagged_reference_t eval_application(environment_t* env,
     sequence = untag_pair(sequence->tail);
   }
 
-  // Hopefully do a tail call to evaluate the last element of the
-  // lambda expression's body;
-  return eval(env, sequence->head);
+  TAIL_CALL return eval(env, sequence->head);
 }
 
 /**

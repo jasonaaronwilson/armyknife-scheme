@@ -3,8 +3,9 @@ all: armyknife-scheme
 CC = clang
 #CC = gcc
 
-# debug information
-CC_FLAGS=-g -rdynamic
+# debug information and O3 some optimization is necessary for tail
+# calls.
+CC_FLAGS=-g -rdynamic -O3
 
 SRC_C = allocate.c \
 	array.c \
