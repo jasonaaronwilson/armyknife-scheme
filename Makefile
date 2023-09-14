@@ -1,7 +1,7 @@
 all: armyknife-scheme
 
-CC = clang
-#CC = gcc
+#CC = clang
+CC = gcc
 
 # debug information and O3 some optimization is necessary for tail
 # calls.

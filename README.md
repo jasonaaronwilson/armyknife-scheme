@@ -62,11 +62,13 @@ Boehm–Demers–Weiser garbage collector.
 
 ## Status
 
-I've just begun to split out the scheme interpreter I was using to
-drive a VM I was writing after realizing that I could just use "chibi
-scheme" instead of building an incomplete and slow scheme. On the
-otherhand polishing what I created so far may make this is fun piece
-of code for others to read.
+clang doesn't do tail calls yet but gcc does. Additionally because of
+the way closures are called, we still malloc an environment on each
+call. In theory this would be fine if we had a garbage
+collector. Maybe we can do reference counting on environments?
+
+There are several more functions I'd like to implement - enough to
+write some tests.
 
 I may slowly add some of R7RS. I would love to be able to use an
 existing scheme reader written in scheme and only use the weak reader

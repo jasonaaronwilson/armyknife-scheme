@@ -33,6 +33,9 @@
 #define HASHCODE_QUOTE UINT64_C(10597478766694597373)
 #define HASHCODE_SET_BANG UINT64_C(8292903574644452355)
 
+// These must have the same signature as eval() to have a chance of
+// doing tail recursion.
+
 tagged_reference_t eval_if_expression(environment_t* env,
                                       tagged_reference_t expr);
 tagged_reference_t eval_assignment(environment_t* env, tagged_reference_t expr);
