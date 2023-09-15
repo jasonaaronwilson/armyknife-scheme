@@ -32,6 +32,7 @@ SRC_GENERATED_H = \
 	evaluator.h \
 	fatal-error.h \
 	global-environment.h \
+	io.h \
 	pair.h
 
 SRC_H = ${SRC_GENERATED_H} \
