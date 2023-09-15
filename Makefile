@@ -41,6 +41,7 @@ SRC_GENERATED_H = \
 
 SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
+	tagged-reference.h \
 	optional.h \
 	scheme-symbol.h \
 
