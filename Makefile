@@ -41,9 +41,12 @@ SRC_H = allocate.h \
 	scheme-symbol.h \
 	string-util.h
 
-armyknife-scheme: ${SRC_C} ${SRC_H}
+armyknife-scheme: generate-header-files ${SRC_C} ${SRC_H}
 	${CC} ${CC_FLAGS} ${SRC_C} -o armyknife-scheme
 	stat --format=%s armyknife-scheme
+
+generate-header-files: ${SRC_C}
+	../c-single-source-file/generate-header-file ${SRC_C}
 
 SYMBOL_HASH_SRC_C=string-util.c symbol-hash-main.c allocate.c fatal-error.c
 SYMBOL_HASH_SRC_H=string-util.h
@@ -58,7 +61,7 @@ CLEAN_BINARIES = \
 	a.out armyknife-scheme symbol-hash
 
 clean:
-	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs 
+	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs allocate.h
 
 diff: clean
 	git difftool HEAD
