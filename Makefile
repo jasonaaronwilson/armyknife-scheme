@@ -61,7 +61,7 @@ CLEAN_BINARIES = \
 	a.out armyknife-scheme symbol-hash
 
 clean:
-	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs allocate.h
+	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs allocate.h array.h
 
 diff: clean
 	git difftool HEAD
