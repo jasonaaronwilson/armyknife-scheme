@@ -33,14 +33,13 @@ SRC_GENERATED_H = \
 	fatal-error.h \
 	global-environment.h \
 	io.h \
-	pair.h
+	pair.h \
+	primitive.h
 
 SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
-	io.h \
 	optional.h \
 	pair.h \
-	primitive.h \
 	printer.h \
 	reader.c \
 	scheme-symbol.h \
