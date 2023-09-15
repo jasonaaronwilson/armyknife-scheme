@@ -23,11 +23,15 @@ SRC_C = allocate.c \
 	reader.c \
 	string-util.c
 
-SRC_H = allocate.h \
+SRC_GENERATED_H = \
+	allocate.h \
 	array.h \
+	byte-array.h \
+	closure.h
+
+SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
 	byte-array.h \
-	closure.h \
 	environment.h \
 	evaluator.h \
 	fatal-error.h \
@@ -61,7 +65,7 @@ CLEAN_BINARIES = \
 	a.out armyknife-scheme symbol-hash
 
 clean:
-	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs allocate.h array.h
+	rm -rf *~ docs/*~ tests/*~ scheme/*~ ${CLEAN_BINARIES} TAGS doxygen-docs ${SRC_GENERATED_H}
 
 diff: clean
 	git difftool HEAD
