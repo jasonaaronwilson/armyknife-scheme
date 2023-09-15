@@ -8,6 +8,24 @@
  * linked lists built out of pairs plus various "atoms").
  */
 
+// ======================================================================
+// This is block is extraced to evaluator.h
+// ======================================================================
+
+#ifndef _EVALUATOR_T_H_
+#define _EVALUATOR_T_H_
+
+#include "boolean.h"
+#include "environment.h"
+#include "tagged-reference.h"
+
+extern tagged_reference_t eval(environment_t* env, tagged_reference_t expr,
+                               boolean_t in_tail_position);
+
+#endif /* _EVALUATOR_T_H_ */
+
+// ======================================================================
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

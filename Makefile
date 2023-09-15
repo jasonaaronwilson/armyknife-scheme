@@ -27,7 +27,9 @@ SRC_GENERATED_H = \
 	allocate.h \
 	array.h \
 	byte-array.h \
-	closure.h
+	closure.h \
+	environment.h \
+	evaluator.h
 
 SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
