@@ -74,7 +74,7 @@ tagged_reference_t eval_lambda(environment_t* env, tagged_reference_t expr,
 tagged_reference_t eval(environment_t* env, tagged_reference_t expr,
                         boolean_t in_tail_position) {
 
-  fprintf(stderr, "in_tail_position = %d\n", in_tail_position);
+  // fprintf(stderr, "in_tail_position = %d\n", in_tail_position);
 
   // Handle self-evaluating values and variable lookups
   switch (expr.tag) {
@@ -177,10 +177,16 @@ tagged_reference_t eval_if_expression(environment_t* env,
 // I guess technically this doesn't need have the same signature?
 tagged_reference_t eval_assignment(environment_t* env, tagged_reference_t expr,
                                    boolean_t in_tail_position) {
+  pair_t* lst = untag_pair(expr);
+
   // TODO(jawilson): do the assignment!
   if (in_tail_position && !env->is_captured) {
     free_bytes(env);
   }
+  tagged_reference_t var_symbol = pair_list_get(lst, 1);
+  tagged_reference_t expr_value = pair_list_get(lst, 2);
+  tagged_reference_t value = eval(env, expr_value, false);
+  environment_set(env, untag_scheme_symbol(var_symbol), value);
   return NIL;
 }
 

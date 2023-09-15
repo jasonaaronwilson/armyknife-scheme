@@ -54,6 +54,8 @@ typedef struct {
 
 #define NIL tagged_reference(TAG_NULL, 0)
 
+#define is_nil(ref) (ref.tag == TAG_NULL)
+
 /**
  * This macro checks that the tagged_reference_t has the correct tag.
  */

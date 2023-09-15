@@ -33,8 +33,8 @@ static inline closure_t* untag_closure_t(tagged_reference_t closure) {
 
 // ======================================================================
 
-#include "closure.h"
 #include "allocate.h"
+#include "closure.h"
 
 /**
  * Allocate the space for a closure accepting at most "N"

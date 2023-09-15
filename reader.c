@@ -19,7 +19,8 @@ typedef struct {
   uint64_t end;
 } read_expression_result_t;
 
-extern read_expression_result_t read_expression(const char* str, uint64_t start);
+extern read_expression_result_t read_expression(const char* str,
+                                                uint64_t start);
 
 #endif /* _READER_H_ */
 

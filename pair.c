@@ -29,6 +29,7 @@ extern tagged_reference_t pair_list_get(pair_t* head, uint64_t index);
 extern void pair_list_set(pair_t* head, uint64_t index,
                           tagged_reference_t element);
 extern pair_t* pair_list_append(pair_t* lst1, pair_t* lst2);
+extern pair_t* pair_assoc_list_find_binding(pair_t* lst, char* name);
 extern optional_t pair_assoc_list_lookup(pair_t* lst, char* name);
 
 static inline pair_t* untag_pair(tagged_reference_t reference) {
@@ -49,6 +50,7 @@ extern tagged_reference_t cdr(tagged_reference_t pair);
 
 // ======================================================================
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "allocate.h"
@@ -128,19 +130,29 @@ pair_t* pair_list_append(pair_t* lst_1, pair_t* lst_2) {
   }
 }
 
-optional_t pair_assoc_list_lookup(pair_t* lst, char* name) {
+pair_t* pair_assoc_list_find_binding(pair_t* lst, char* name) {
   while (lst) {
-    tagged_reference_t element = lst->head;
-    pair_t* binding = untag_pair(element);
-
-    if (string_equal(name, untag_string_or_reader_symbol(binding->head))) {
-      return optional_of(binding->tail);
+    tagged_reference_t binding_ref = lst->head;
+    pair_t* binding = untag_pair(binding_ref);
+    if (string_equal(name, untag_reader_symbol(binding->head))) {
+      return binding;
     }
-    lst = ((pair_t*) lst->tail.data);
+    if (is_nil(lst->tail)) {
+      break;
+    }
+    lst = untag_pair(lst->tail);
   }
 
-  return optional_empty();
+  return NULL;
 }
 
-// TODO(jawilson): tagged_pair_alist_find, tagged_pair_alist_insert,
-// tagged_pair_alist_remove
+optional_t pair_assoc_list_lookup(pair_t* lst, char* name) {
+  pair_t* binding = pair_assoc_list_find_binding(lst, name);
+  if (binding == NULL) {
+    return optional_empty();
+  } else {
+    return optional_of(binding->tail);
+  }
+}
+
+// TODO(jawilson): tagged_pair_alist_insert, tagged_pair_alist_remove

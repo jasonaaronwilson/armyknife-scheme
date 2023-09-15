@@ -4,8 +4,8 @@ all: armyknife-scheme
 CC = gcc
 
 # debug information and O3 some optimization is necessary for tail
-# calls.
-CC_FLAGS=-g -rdynamic -O3
+# calls.  ## -O3
+CC_FLAGS=-g -rdynamic
 
 SRC_C = allocate.c \
 	array.c \
@@ -39,14 +39,14 @@ SRC_GENERATED_H = \
 	reader.h \
 	string-util.h
 
-SRC_H = ${SRC_GENERATED_H} \
+SRC_H =  \
 	boolean.h \
 	ct-assert.h \
 	tagged-reference.h \
 	optional.h \
 	scheme-symbol.h \
 
-armyknife-scheme: generate-header-files ${SRC_C} ${SRC_H}
+armyknife-scheme: generate-header-files ${SRC_C} ${SRC_H} ${SRC_GENERATED_H}
 	${CC} ${CC_FLAGS} ${SRC_C} -o armyknife-scheme
 	stat --format=%s armyknife-scheme
 

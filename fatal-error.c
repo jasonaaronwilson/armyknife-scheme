@@ -31,6 +31,7 @@ typedef enum {
   ERROR_MAX_PRIMITIVE_ARGS,
   ERROR_WRONG_NUMBER_OF_ARGS,
   ERROR_CLOSURE_HAS_NO_BODY,
+  ERROR_NULL_ENVIRONMENT,
 } error_code_t;
 
 extern _Noreturn void fatal_error_impl(char* file, int line, int error_code);

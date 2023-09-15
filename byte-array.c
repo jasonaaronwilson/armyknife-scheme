@@ -10,6 +10,7 @@
 #define _BYTE_ARRAY_H_
 
 #include <stdint.h>
+#include <string.h>
 
 typedef struct {
   uint32_t length;
@@ -29,6 +30,9 @@ __attribute__((warn_unused_result)) extern byte_array_t*
 __attribute__((warn_unused_result)) extern byte_array_t*
     byte_array_append_bytes(byte_array_t* arr, uint8_t* bytes,
                             uint64_t n_bytes);
+
+__attribute__((warn_unused_result)) extern byte_array_t*
+    byte_array_append_string(byte_array_t* arr, const char* str);
 
 #endif /* _BYTE_ARRAY_H_ */
 
@@ -101,4 +105,9 @@ __attribute__((warn_unused_result)) byte_array_t*
     arr = byte_array_append_byte(arr, bytes[i]);
   }
   return arr;
+}
+
+__attribute__((warn_unused_result)) byte_array_t*
+    byte_array_append_string(byte_array_t* arr, const char* str) {
+  return byte_array_append_bytes(arr, (uint8_t*) str, strlen(str));
 }

@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 #include "byte-array.h"
+#include "environment.h"
 #include "tagged-reference.h"
 
 __attribute__((warn_unused_result)) byte_array_t*
@@ -31,6 +32,7 @@ __attribute__((warn_unused_result)) byte_array_t*
 #include <string.h>
 
 #include "byte-array.h"
+#include "environment.h"
 #include "pair.h"
 #include "printer.h"
 #include "string-util.h"

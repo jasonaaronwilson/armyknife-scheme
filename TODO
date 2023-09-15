@@ -1,12 +1,9 @@
 # TODO
 
-* add tail call annotations
-* make tags an enum - hopefully allows gdb to display them
-  better. probably the same for error codes.
-* exit, <, >, eq?, read, write, etc. we should be able to run an
-  infinite loop
-* test:expect + some tests!
-* add hack to define so we can put a debug name on closures...
+* exit, <,  <=, =, >=, >, eq?, read, write, etc.
+* test:expect and some tests!
+* add hack to define so we can put a debug name on closures... (added
+  but not working?)
 * search for FIXME and TODOs and try to fix any that are easy
 * why not use macros for casts for all types? as_string, etc.
 * code in printer.c should print to a byte buffer.
