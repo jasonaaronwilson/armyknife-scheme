@@ -34,14 +34,13 @@ SRC_GENERATED_H = \
 	global-environment.h \
 	io.h \
 	pair.h \
-	primitive.h
+	primitive.h \
+	printer.h \
+	reader.h
 
 SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
 	optional.h \
-	pair.h \
-	printer.h \
-	reader.c \
 	scheme-symbol.h \
 	string-util.h
 
