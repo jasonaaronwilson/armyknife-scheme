@@ -29,15 +29,13 @@ SRC_GENERATED_H = \
 	byte-array.h \
 	closure.h \
 	environment.h \
-	evaluator.h
-
-SRC_H = ${SRC_GENERATED_H} \
-	boolean.h \
-	byte-array.h \
-	environment.h \
 	evaluator.h \
 	fatal-error.h \
 	global-environment.h \
+	pair.h
+
+SRC_H = ${SRC_GENERATED_H} \
+	boolean.h \
 	io.h \
 	optional.h \
 	pair.h \
