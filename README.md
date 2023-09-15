@@ -62,10 +62,8 @@ Boehm–Demers–Weiser garbage collector.
 
 ## Status
 
-clang doesn't do tail calls yet but gcc does. Additionally because of
-the way closures are called, we still malloc an environment on each
-call. In theory this would be fine if we had a garbage
-collector. Maybe we can do reference counting on environments?
+clang doesn't do tail calls yet (which is a mystery - maybe my clang
+version is too old?) but gcc does.
 
 There are several more functions I'd like to implement - enough to
 write some tests.
@@ -79,5 +77,4 @@ I wrote to bootstrap the real reader.
 Hopefully you will enjoy reading this code. Besides being woefully
 incomplete, I'm pretty sure this scheme will be extremely slow (though
 startup times should be lightning fast). I may slowly add parts of
-R7RS. It would be 
-
+R7RS.
