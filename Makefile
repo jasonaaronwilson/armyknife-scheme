@@ -36,13 +36,13 @@ SRC_GENERATED_H = \
 	pair.h \
 	primitive.h \
 	printer.h \
-	reader.h
+	reader.h \
+	string-util.h
 
 SRC_H = ${SRC_GENERATED_H} \
 	boolean.h \
 	optional.h \
 	scheme-symbol.h \
-	string-util.h
 
 armyknife-scheme: generate-header-files ${SRC_C} ${SRC_H}
 	${CC} ${CC_FLAGS} ${SRC_C} -o armyknife-scheme
